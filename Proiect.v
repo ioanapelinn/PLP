@@ -559,7 +559,7 @@ end.
 
 
 Inductive Stmt : Type :=
-| declare : string-> string -> Stmt
+| declare : string -> string -> Stmt
 | assignment : string -> Exp -> Stmt
 | initialize : string -> string -> Exp -> Stmt
 | sequence : Stmt -> Stmt -> Stmt
@@ -582,10 +582,22 @@ Inductive Stmt : Type :=
 | pushString : string -> String -> Stmt
 | pushMatrix : string -> Array -> Stmt 
 | pop : string -> Stmt
-| declareStruct : string -> list pair_struct -> Stmt.
+| declareStruct : string -> list pair_struct -> Stmt
+| get_element_from_struct : string -> string -> Stmt
+| set_element_struct : string -> string -> types_allowed -> Stmt
+| declareMap : string -> list (pair_map types_allowed types_allowed) -> Stmt
+| addToMap : string -> pair_map types_allowed types_allowed -> Stmt
+| getValue : string -> types_allowed -> Stmt.
 
 
 
+Notation "X ::= A" := (assignment X A) (at level 80).
+Notation "'Let' T S" := (declare T S) (at level 79).
+Notation "S1 ;; S2" := (sequence S1 S2 ) (at level 98, left associativity).
+Notation "'If' ( B ) 'Then' ( S1 ) 'Else' ( S2 ) 'EndIte'" := (ifthenelse B S1 S2) (at level 97).
+Notation "'If' ( B ) 'Then' ( S ) 'EndI'" := (ifthen B S ) (at level 97).
+Notation "'While' ( B ) { S } 'EndW'" := (while_loop B S) (at level 97).
+Notation "'For' ( S1 ';' B ';' S2 ) { S3 }  'EndF'" := (for_loop S1 B S2 S3) (at level 97).
 
 
 
