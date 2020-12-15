@@ -7,7 +7,7 @@ Require Import Strings.String.
 Scheme Equality for string.
 Local Open Scope string_scope.
 
-
+ 
 Inductive Nat : Type :=
 | TypeNat : nat -> Nat
 | ErrorNat : Nat. 
@@ -559,9 +559,18 @@ end.
 
 
 Inductive Stmt : Type :=
-| declare : string -> string -> Stmt
-| assignment : string -> Exp -> Stmt
-| initialize : string -> string -> Exp -> Stmt
+| declareNat :  string -> Stmt
+| declareBool :  string -> Stmt
+| declareString :  string -> Stmt
+
+| assignmentNat : string -> Exp -> Stmt
+| assignmentBool : string -> Exp -> Stmt
+| assignmentString : string -> Exp -> Stmt
+
+| initializeNat : string -> Exp -> Stmt
+| initializeBool : string -> Exp -> Stmt
+| initializeString : string -> Exp -> Stmt
+
 | sequence : Stmt -> Stmt -> Stmt
 | ifthenelse : Exp -> Stmt -> Stmt -> Stmt
 | ifthen : Exp -> Stmt -> Stmt 
@@ -570,34 +579,95 @@ Inductive Stmt : Type :=
 | switch_case : string -> list (pair_map Nat Stmt) -> Stmt
 | break : Stmt
 | continue : Stmt
-| declareArray : string -> string -> Stmt
-| initializeArray : string -> string -> list Types -> Stmt
+
+(*for Array*)
+| declareArrayNat : string -> Stmt
+| declareArrayBool : string -> Stmt
+| declareArrayString : string -> Stmt
+| declareMatrix : string -> Stmt
+
+| initializeArrayNat : string -> list Nat -> Stmt
+| initializeArrayBool : string -> list Bool -> Stmt
+| initializeArrayString : string -> list String -> Stmt
+| initializeMatrix : string -> list Array -> Stmt
+
 | getElemArray : string -> nat -> Stmt
+
 | setElemArrayNat : string -> nat -> Nat -> Stmt
 | setElemArrayBool : string -> nat -> Bool -> Stmt
 | setElemArrayString : string -> nat -> String -> Stmt
-| setElemArrayMatrix : string -> nat -> Array -> Stmt
+| setElemMatrix : string -> nat -> Array -> Stmt
+
 | pushNat : string -> Nat -> Stmt
 | pushBool : string -> Bool -> Stmt
 | pushString : string -> String -> Stmt
 | pushMatrix : string -> Array -> Stmt 
+
 | pop : string -> Stmt
+
+(*for Struct*)
 | declareStruct : string -> list pair_struct -> Stmt
 | get_element_from_struct : string -> string -> Stmt
 | set_element_struct : string -> string -> types_allowed -> Stmt
+
+(*for Map*)
 | declareMap : string -> list (pair_map types_allowed types_allowed) -> Stmt
 | addToMap : string -> pair_map types_allowed types_allowed -> Stmt
 | getValue : string -> types_allowed -> Stmt.
 
+ 
+Notation "'nat' S" := (declareNat S) (at level 79).
+Notation "'boolean' S" := (declareBool S) (at level 79).
+Notation "'char' S" := (declareString S) (at level 79).
 
+Notation "S :n= E" := (assignmentNat S E) (at level 80).
+Notation "S :b= E" := (assignmentBool S E) (at level 80).
+Notation "S :s= E" := (assignmentString S E) (at level 80).
 
-Notation "X ::= A" := (assignment X A) (at level 80).
-Notation "'Let' T S" := (declare T S) (at level 79).
+Notation "'nat' S ::= E" := (initializeNat S E) (at level 78).
+Notation "'boolean' S ::= E" := (initializeBool S E) (at level 78).
+Notation "'char' S ::= E" := (initializeString S E) (at level 78).
+
 Notation "S1 ;; S2" := (sequence S1 S2 ) (at level 98, left associativity).
 Notation "'If' ( B ) 'Then' ( S1 ) 'Else' ( S2 ) 'EndIte'" := (ifthenelse B S1 S2) (at level 97).
 Notation "'If' ( B ) 'Then' ( S ) 'EndI'" := (ifthen B S ) (at level 97).
 Notation "'While' ( B ) { S } 'EndW'" := (while_loop B S) (at level 97).
 Notation "'For' ( S1 ';' B ';' S2 ) { S3 }  'EndF'" := (for_loop S1 B S2 S3) (at level 97).
+Notation "'switch'( X ) 'cases': C" := (switch_case X C) (at level 97).
+Notation "'Break'" := (break) (at level 97).
+Notation "'Continue'" := (continue) (at level 97).
+
+Notation "[Natural] V" := (declareArrayNat V) (at level 79).
+Notation "[Boolean] V" := (declareArrayBool V) (at level 79).
+Notation "[String] V" := (declareArrayString V) (at level 79).
+Notation "[[Matrix]] V" := (declareMatrix V) (at level 79).
+
+Notation "[Natural] V ::= L" := (initializeArrayNat V L) (at level 79).
+Notation "[Boolean] V ::= L" := (initializeArrayBool V L) (at level 79).
+Notation "[String] V ::= L" := (initializeArrayString V L) (at level 79).
+Notation "[[Matrix]] V ::= L" := (initializeMatrix V L) (at level 79).
+
+Notation "V [ P ]" := (getElemArray V P)(at level 79).
+
+Notation "V [ P ] :n= L" := (setElemArrayNat V P L) (at level 78). 
+Notation "V [ P ] :b= L" := (setElemArrayBool V P L) (at level 78). 
+Notation "V [ P ] :s= L" := (setElemArrayString V P L) (at level 78). 
+Notation "V [ P ] :m= L" := (setElemMatrix V P L) (at level 78). 
+
+Notation "push_n( V ) X" := (pushNat V X) (at level 79).
+Notation "push_b( V ) X" := (pushBool V X) (at level 79).
+Notation "push_s( V ) X" := (pushString V X) (at level 79).
+Notation "push_m( V ) X" := (pushMatrix V X) (at level 79).
+
+Notation "pop ( V )" := (pop V) (at level 79).
+
+Notation "'struct'( N ): L" := (declareStruct N L) (at level 79).
+Notation "'get' N ( F )" := (get_element_struct N F) (at level 79).
+Notation "'set' N ( F ) ::= V" := (set_element_struct N F V) (at level 79).
+
+Notation "'Map' M ::= L" := (declareMap M L) (at level 79).
+Notation "'add' M P" := (addToMap M P) (at level 79).
+Notation "'get_map' M ( K )" := (getValue M K) (at level 79).
 
 
 
